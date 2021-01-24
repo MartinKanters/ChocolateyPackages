@@ -35,9 +35,10 @@ jobs:
             zip_artifact_url="${successful_build_url}artifact/${zip_artifact_path}"
             zip_hash=$(curl -q "$zip_artifact_url" | sha256sum | awk '{print $1}')
             new_package_version=$(date +'%Y%m%d.%H%M')
+            escaped_zip_artifact_url=$(printf '%s\n' "$zip_artifact_url" | sed -e 's/[\/&]/\\&/g')
             
             sed -ir 's/$checksum =.*/$checksum = \"'${zip_hash}'\"/' tools/chocolateyinstall.ps1
-            sed -ir 's/$url =.*/$url = \"'${zip_artifact_url}'\"/' tools/chocolateyinstall.ps1
+            sed -ir 's/$url =.*/$url = \"'${escaped_zip_artifact_url}'\"/' tools/chocolateyinstall.ps1
             sed -ir 's/    <version>.*/    <version>'${new_package_version}'<\/version>/' maven-snapshot.nuspec
             echo $last_successful_build_number > last-build.txt
             
