@@ -65,7 +65,8 @@ jobs:
             
             echo "ORIG_MVN_VERSION=$orig_mvn_version" >> $GITHUB_ENV
             echo "M2_HOME=C:\ProgramData\chocolatey\lib\maven-snapshot" >> $GITHUB_ENV
-            echo "$M2_HOME/bin" >> $GITHUB_PATH
+            
+            echo "%M2_HOME%\bin" >> $GITHUB_PATH
           else
             echo "No git changes detected, nothing to do"
           fi
