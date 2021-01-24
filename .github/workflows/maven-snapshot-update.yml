@@ -4,27 +4,27 @@ on:
     - cron:  '0 * * * *'
 jobs:
   update-package:
-	runs-on: ubuntu-latest
-	
-	steps:
+    runs-on: ubuntu-latest
+    
+    steps:
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Configure Git
-	    run: |
+        run: |
           git config --global user.email "martinkanters@noreply.github.com"
           git config --global user.name "Martin Kanters"
 
       - name: Update package if needed
         shell: bash
         run: |
-		  base_jenkins_url="https://ci-builds.apache.org/job/Maven/job/maven-box/job/maven/job/master/"
-		  last_successful_build=$(curl ${base_jenkins_url}/api/json | jq '.lastSuccessfulBuild')
-		  
+          base_jenkins_url="https://ci-builds.apache.org/job/Maven/job/maven-box/job/maven/job/master/"
+          last_successful_build=$(curl ${base_jenkins_url}/api/json | jq '.lastSuccessfulBuild')
+          
           last_persisted_build_number=$(cat last-build.txt)
-		  last_successful_build_number=$(echo $last_successful_build | jq '.number')
-		  
-		  if [ "$last_persisted_build_number" == "$last_successful_build_number" ]; then
+          last_successful_build_number=$(echo $last_successful_build | jq '.number')
+          
+          if [ "$last_persisted_build_number" == "$last_successful_build_number" ]; then
             echo "No new successful Maven master build detected, nothing to do"
           else
             echo "Found new successful Jenkins build: ${last_successful_build_number}, old: ${last_persisted_build_number}"
@@ -41,12 +41,12 @@ jobs:
             git status
             git diff
           fi
-		  
-		  
+          
+          
       - name: Persist changes
         shell: bash
         run: |
-		  #git status
+          #git status
           #git diff
           #git commit -am "Update to latest Maven snapshot" || exit 0
           #git remote add github "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
