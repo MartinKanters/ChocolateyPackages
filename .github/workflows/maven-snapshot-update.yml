@@ -5,7 +5,7 @@ name: Update maven-snapshot Chocolatey package
 on: [push]
 jobs:
   update-package:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     
     steps:
       - name: Checkout
