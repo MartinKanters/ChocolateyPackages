@@ -19,6 +19,7 @@ jobs:
       - name: Update package if needed
         shell: bash
         run: |
+          cd maven-snapshot/
           base_jenkins_url="https://ci-builds.apache.org/job/Maven/job/maven-box/job/maven/job/master/"
           last_successful_build=$(curl ${base_jenkins_url}/api/json | jq '.lastSuccessfulBuild')
           
@@ -35,9 +36,9 @@ jobs:
             zip_hash=$(curl $zip_artifact_url | sha256sum | awk '{print $1}')
             new_package_version=$(date +'%Y%m%d.%H%M')
             
-            sed -ir 's/$checksum =.*/$checksum = \"'${zip_hash}'\"/' maven-snapshot/tools/chocolateyinstall.ps1
-            sed -ir 's/$url =.*/$url = \"'${zip_artifact_url}'\"/' maven-snapshot/tools/chocolateyinstall.ps1
-            sed -ir 's/    <version>.*/    <version>'${new_package_version}'<\/version>/' maven-snapshot/maven-snapshot.nuspec
+            sed -ir 's/$checksum =.*/$checksum = \"'${zip_hash}'\"/' tools/chocolateyinstall.ps1
+            sed -ir 's/$url =.*/$url = \"'${zip_artifact_url}'\"/' tools/chocolateyinstall.ps1
+            sed -ir 's/    <version>.*/    <version>'${new_package_version}'<\/version>/' maven-snapshot.nuspec
             
             git status
             git diff
