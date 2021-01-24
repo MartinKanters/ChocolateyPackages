@@ -62,10 +62,8 @@ jobs:
             
             echo "Installing Maven snapshot"
             choco install maven-snapshot -y -s .
-            set M2_HOME="C:\ProgramData\chocolatey\lib\maven-snapshot"
-            set PATH=%M2_HOME%\bin;%PATH%
-            mvn -v
-            mvn_snapshot_version=$(mvn -v | head -n 1)
+            C:\ProgramData\chocolatey\lib\maven-snapshot\bin\mvn -v
+            mvn_snapshot_version=$(C:\ProgramData\chocolatey\lib\maven-snapshot\bin\mvn -v | head -n 1)
             
             if [[ "$mvn_snapshot_version" != Apache* ]]; then
               echo "Error: First line of snapshot mvn -v is not valid, is it installed correctly?"
