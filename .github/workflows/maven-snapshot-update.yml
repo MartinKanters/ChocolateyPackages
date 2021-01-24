@@ -21,7 +21,7 @@ jobs:
         run: |
           cd maven-snapshot/
           base_jenkins_url="https://ci-builds.apache.org/job/Maven/job/maven-box/job/maven/job/master/"
-          last_successful_build=$(curl ${base_jenkins_url}/api/json | jq '.lastSuccessfulBuild')
+          last_successful_build=$(curl -q "${base_jenkins_url}/api/json" | jq '.lastSuccessfulBuild')
           
           last_persisted_build_number=$(cat last-build.txt)
           last_successful_build_number=$(echo $last_successful_build | jq '.number')
@@ -30,15 +30,16 @@ jobs:
             echo "No new successful Maven master build detected, nothing to do"
           else
             echo "Found new successful Jenkins build: ${last_successful_build_number}, old: ${last_persisted_build_number}"
-            successful_build_url=$(echo $last_successful_build | jq '.url')
-            zip_artifact_path=$(curl ${successful_build_url}api/json | jq '.artifacts[]|select(.fileName | test("^apache-maven-\\d.*-bin\\.zip$"))|.relativePath')
+            successful_build_url=$(echo $last_successful_build | jq -r '.url')
+            zip_artifact_path=$(curl -q "${successful_build_url}api/json" | jq -r '.artifacts[]|select(.fileName | test("^apache-maven-\\d.*-bin\\.zip$"))|.relativePath')
             zip_artifact_url="${successful_build_url}artifact/${zip_artifact_path}"
-            zip_hash=$(curl $zip_artifact_url | sha256sum | awk '{print $1}')
+            zip_hash=$(curl -q "$zip_artifact_url" | sha256sum | awk '{print $1}')
             new_package_version=$(date +'%Y%m%d.%H%M')
             
             sed -ir 's/$checksum =.*/$checksum = \"'${zip_hash}'\"/' tools/chocolateyinstall.ps1
             sed -ir 's/$url =.*/$url = \"'${zip_artifact_url}'\"/' tools/chocolateyinstall.ps1
             sed -ir 's/    <version>.*/    <version>'${new_package_version}'<\/version>/' maven-snapshot.nuspec
+            echo $last_successful_build_number > last-build.txt
             
             git status
             git diff
