@@ -71,7 +71,7 @@ jobs:
             mvn -v
             mvn_snapshot_version=$(mvn -v | head -n 1)
             
-            if [[ "$mvn_snapshot_version" != "Apache Maven*" ]]; then
+            if [[ "$mvn_snapshot_version" != Apache* ]]; then
               echo "Error: First line of snapshot mvn -v is not valid, is it installed correctly?"
               exit 1
             fi
