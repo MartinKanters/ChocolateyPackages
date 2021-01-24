@@ -45,8 +45,8 @@ jobs:
             sed -ir 's/    <version>.*/    <version>'${new_package_version}'<\/version>/' maven-snapshot.nuspec
             echo $last_successful_build_number > last-build.txt
           fi
-
-      - name: Choco pack and test
+          
+      - name: Choco pack and install
         shell: bash
         run: |
           if ! git diff --quiet
@@ -56,25 +56,35 @@ jobs:
             
             orig_mvn_version=$(mvn -v | head -n 1)
             echo "Currently installed maven: $orig_mvn_version"
+            echo "ORIG_MVN_VERSION=$orig_mvn_version" >> $GITHUB_ENV
             
             echo "Choco pack"
             choco pack
             
             echo "Installing Maven snapshot"
             choco install maven-snapshot -y --no-progress -s .
-            
-            # Unfortunately choco's `refreshenv` does not work
-            echo "pwd: "
-            pwd
-            cd /c/ProgramData/chocolatey/lib/maven-snapshot/bin
+          else
+            echo "No git changes detected, nothing to do"
+          fi
+
+      - name: Choco Test
+        shell: bash
+        run: |
+          if ! git diff --quiet
+          then
+            echo "New Maven version:"
             mvn -v
-            mvn_snapshot_version=$(call "C:/ProgramData/chocolatey/lib/maven-snapshot/bin/mvn -v" | head -n 1)
+            mvn_snapshot_version=$(mvn -v | head -n 1)
             
             if [[ "$mvn_snapshot_version" != Apache* ]]; then
               echo "Error: First line of snapshot mvn -v is not valid, is it installed correctly?"
               exit 1
             fi
-            if [ "$orig_mvn_version" == "$mvn_snapshot_version" ]; then
+            if [ "$ORIG_MVN_VERSION" == "" ]; then
+              echo "Somehow the original Maven version environment variable got lost"
+              exit 1
+            fi
+            if [ "$ORIG_MVN_VERSION" == "$mvn_snapshot_version" ]; then
               echo "Error: Maven Snapshot version is identical to the original Maven version"
               exit 1
             fi
