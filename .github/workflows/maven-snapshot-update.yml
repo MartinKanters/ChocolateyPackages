@@ -45,8 +45,58 @@ jobs:
             sed -ir 's/    <version>.*/    <version>'${new_package_version}'<\/version>/' maven-snapshot.nuspec
             echo $last_successful_build_number > last-build.txt
           fi
-          
-          
+
+      - name: Choco pack and test
+        shell: bash
+        run: |
+          if ! git diff --quiet
+          then
+            echo "Detected git changes, will install original Maven first, then maven-snapshot and compare version output"
+            cd maven-snapshot
+            echo "Installing Maven"
+            choco install maven -y
+            echo "Current maven version: "
+            refreshenv
+            mvn -v
+            orig_mvn_version=$(mvn -v | head -n 1)
+            
+            if [[ "$orig_mvn_version" != "Apache Maven*" ]]; then
+              echo "Error: First line of mvn -v is not valid, is it installed correctly?"
+              exit 1
+            fi
+            
+            echo "Choco pack"
+            choco pack
+            
+            echo "Installing Maven snapshot"
+            choco install maven-snapshot -y -s .
+            refreshenv
+            mvn -v
+            mvn_snapshot_version=$(mvn -v | head -n 1)
+            
+            if [[ "$mvn_snapshot_version" != "Apache Maven*" ]]; then
+              echo "Error: First line of snapshot mvn -v is not valid, is it installed correctly?"
+              exit 1
+            fi
+            if [ "$orig_mvn_version" -eq "$mvn_snapshot_version" ]; then
+              echo "Error: Maven Snapshot version is identical to the original Maven version"
+              exit 1
+            fi
+            
+            echo "Uninstalling Maven snapshot"
+            choco uninstall maven-snapshot -y
+            refreshenv
+            mvn -v
+            restored_mvn_version=$(mvn -v | head -n 1)
+            
+            if [ "$orig_mvn_version" -ne "$restored_mvn_version" ]; then
+              echo "Error: Restored Maven version is not identical to the original Maven version"
+              exit 1
+            fi
+          else
+            echo "No git changes detected, nothing to do"
+          fi
+         
       - name: Persist changes
         shell: bash
         run: |
