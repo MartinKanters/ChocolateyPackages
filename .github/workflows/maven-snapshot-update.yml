@@ -41,7 +41,7 @@ jobs:
             sed -ir 's/$checksum =.*/$checksum = \"'${zip_hash}'\"/' tools/chocolateyinstall.ps1
             echo "Setting artifact url to: ${zip_artifact_url}"
             sed -ir 's/$url =.*/$url = \"'${escaped_zip_artifact_url}'\"/' tools/chocolateyinstall.ps1
-            echo "Setting package version to: new_package_version"
+            echo "Setting package version to: ${new_package_version}"
             sed -ir 's/    <version>.*/    <version>'${new_package_version}'<\/version>/' maven-snapshot.nuspec
             echo $last_successful_build_number > last-build.txt
           fi
