@@ -51,25 +51,18 @@ jobs:
         run: |
           if ! git diff --quiet
           then
-            echo "Detected git changes, will install original Maven first, then maven-snapshot and compare version output"
+            echo "Detected git changes, will pack and install maven-snapshot"
             cd maven-snapshot
-            echo "Installing Maven"
-            choco install maven -y --force
-            Update-SessionEnvironment
-            mvn -v
-            orig_mvn_version=$(mvn -v | head -n 1)
             
-            if [[ "$orig_mvn_version" != "Apache Maven*" ]]; then
-              echo "Error: First line of mvn -v is not valid, is it installed correctly?"
-              exit 1
-            fi
+            orig_mvn_version=$(mvn -v | head -n 1)
+            echo "Currently installed maven: $orig_mvn_version"
             
             echo "Choco pack"
             choco pack
             
             echo "Installing Maven snapshot"
             choco install maven-snapshot -y -s .
-            Update-SessionEnvironment
+            set M2_HOME="C:\ProgramData\chocolatey\lib\maven-snapshot"
             mvn -v
             mvn_snapshot_version=$(mvn -v | head -n 1)
             
@@ -84,14 +77,6 @@ jobs:
             
             echo "Uninstalling Maven snapshot"
             choco uninstall maven-snapshot -y
-            Update-SessionEnvironment
-            mvn -v
-            restored_mvn_version=$(mvn -v | head -n 1)
-            
-            if [ "$orig_mvn_version" != "$restored_mvn_version" ]; then
-              echo "Error: Restored Maven version is not identical to the original Maven version"
-              exit 1
-            fi
           else
             echo "No git changes detected, nothing to do"
           fi
