@@ -1,7 +1,8 @@
 name: Update maven-snapshot Chocolatey package
-on:
-  schedule:
-    - cron:  '0 * * * *'
+#on:
+#  schedule:
+#    - cron:  '0 * * * *'
+on: [push]
 jobs:
   update-package:
     runs-on: ubuntu-latest
