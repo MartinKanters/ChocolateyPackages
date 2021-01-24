@@ -63,6 +63,7 @@ jobs:
             echo "Installing Maven snapshot"
             choco install maven-snapshot -y -s .
             set M2_HOME="C:\ProgramData\chocolatey\lib\maven-snapshot"
+            set PATH=%M2_HOME%\bin;%PATH%
             mvn -v
             mvn_snapshot_version=$(mvn -v | head -n 1)
             
