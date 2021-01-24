@@ -64,7 +64,10 @@ jobs:
             choco install maven-snapshot -y --no-progress -s .
             
             # Unfortunately choco's `refreshenv` does not work
-            call "C:/ProgramData/chocolatey/lib/maven-snapshot/bin/mvn -v"
+            echo "pwd: "
+            pwd
+            cd C:\\ProgramData\\chocolatey\\lib\\maven-snapshot\\bin
+            mvn -v
             mvn_snapshot_version=$(call "C:/ProgramData/chocolatey/lib/maven-snapshot/bin/mvn -v" | head -n 1)
             
             if [[ "$mvn_snapshot_version" != Apache* ]]; then
