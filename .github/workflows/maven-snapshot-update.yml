@@ -75,7 +75,7 @@ jobs:
               echo "Error: First line of snapshot mvn -v is not valid, is it installed correctly?"
               exit 1
             fi
-            if [ "$orig_mvn_version" -eq "$mvn_snapshot_version" ]; then
+            if [ "$orig_mvn_version" == "$mvn_snapshot_version" ]; then
               echo "Error: Maven Snapshot version is identical to the original Maven version"
               exit 1
             fi
@@ -85,7 +85,7 @@ jobs:
             mvn -v
             restored_mvn_version=$(mvn -v | head -n 1)
             
-            if [ "$orig_mvn_version" -ne "$restored_mvn_version" ]; then
+            if [ "$orig_mvn_version" != "$restored_mvn_version" ]; then
               echo "Error: Restored Maven version is not identical to the original Maven version"
               exit 1
             fi
