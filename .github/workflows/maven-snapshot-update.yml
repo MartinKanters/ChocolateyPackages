@@ -55,6 +55,7 @@ jobs:
             cd maven-snapshot
             echo "Installing Maven"
             choco install maven -y --force
+            Update-SessionEnvironment
             mvn -v
             orig_mvn_version=$(mvn -v | head -n 1)
             
@@ -68,6 +69,7 @@ jobs:
             
             echo "Installing Maven snapshot"
             choco install maven-snapshot -y -s .
+            Update-SessionEnvironment
             mvn -v
             mvn_snapshot_version=$(mvn -v | head -n 1)
             
@@ -82,6 +84,7 @@ jobs:
             
             echo "Uninstalling Maven snapshot"
             choco uninstall maven-snapshot -y
+            Update-SessionEnvironment
             mvn -v
             restored_mvn_version=$(mvn -v | head -n 1)
             
