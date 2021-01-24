@@ -56,13 +56,16 @@ jobs:
             
             orig_mvn_version=$(mvn -v | head -n 1)
             echo "Currently installed maven: $orig_mvn_version"
-            echo "ORIG_MVN_VERSION=$orig_mvn_version" >> $GITHUB_ENV
             
             echo "Choco pack"
             choco pack
             
             echo "Installing Maven snapshot"
             choco install maven-snapshot -y --no-progress -s .
+            
+            echo "ORIG_MVN_VERSION=$orig_mvn_version" >> $GITHUB_ENV
+            echo "M2_HOME=C:\ProgramData\chocolatey\lib\maven-snapshot" >> $GITHUB_ENV
+            echo "$M2_HOME/bin" >> $GITHUB_PATH
           else
             echo "No git changes detected, nothing to do"
           fi
