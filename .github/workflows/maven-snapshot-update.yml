@@ -62,8 +62,15 @@ jobs:
             
             write-host "Installing Maven snapshot"
             choco install maven-snapshot -y --no-progress -s .
-            refreshenv
-            mvn -v
+            
+            # Unfortunately choco's `refreshenv` does not work
+            C:\ProgramData\chocolatey\lib\maven-snapshot\bin\mvn -v
+            $mvn_snapshot_version = C:\ProgramData\chocolatey\lib\maven-snapshot\bin\mvn -v | Select -First 1
+            
+            if ($orig_mvn_version -eq $mvn_snapshot_version) {
+              write-host "Error: Maven Snapshot version is identical to the original Maven version"
+              exit 1
+            }
           } else {
             echo "No git changes detected, nothing to do"
           }
