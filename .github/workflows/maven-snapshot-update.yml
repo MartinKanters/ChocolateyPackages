@@ -53,7 +53,6 @@ jobs:
           if ($LASTEXITCODE -eq 1) {
             cd maven-snapshot
             
-            mvn -v
             $orig_mvn_version = mvn -v | Select -First 1
             write-host "Currently installed maven: $orig_mvn_version"
             
@@ -64,8 +63,8 @@ jobs:
             choco install maven-snapshot -y --no-progress -s .
             
             # Unfortunately choco's `refreshenv` does not work
-            C:\ProgramData\chocolatey\lib\maven-snapshot\bin\mvn -v
             $mvn_snapshot_version = C:\ProgramData\chocolatey\lib\maven-snapshot\bin\mvn -v | Select -First 1
+            write-host "Maven-snapshot installed: $mvn_snapshot_version"
             
             if ($orig_mvn_version -eq $mvn_snapshot_version) {
               write-host "Error: Maven Snapshot version is identical to the original Maven version"
