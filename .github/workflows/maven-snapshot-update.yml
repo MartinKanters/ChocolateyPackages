@@ -71,7 +71,7 @@ jobs:
               exit 1
             }
             
-            
+            exit 0
           } else {
             echo "No git changes detected, nothing to do"
           }
