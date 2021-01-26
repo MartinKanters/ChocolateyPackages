@@ -62,14 +62,16 @@ jobs:
             write-host "Installing Maven snapshot"
             choco install maven-snapshot -y --no-progress -s .
             
-            # Unfortunately choco's `refreshenv` does not work
-            $mvn_snapshot_version = C:\ProgramData\chocolatey\lib\maven-snapshot\apache-maven\bin\mvn -v | Select -First 1
+            # Unfortunately choco's `refreshenv` does not work in Github Actions
+            $mvn_snapshot_version = C:\ProgramData\chocolatey\lib\maven-snapshot\apache-maven\bin\mvn.cmd -v | Select -First 1
             write-host "Maven-snapshot installed: $mvn_snapshot_version"
             
             if ($orig_mvn_version -eq $mvn_snapshot_version) {
               write-host "Error: Maven Snapshot version is identical to the original Maven version"
               exit 1
             }
+            
+            
           } else {
             echo "No git changes detected, nothing to do"
           }
