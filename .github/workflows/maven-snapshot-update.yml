@@ -77,10 +77,16 @@ jobs:
           }
          
       - name: Persist changes
-        shell: bash
+        shell: powershell
         run: |
-          #git status
-          #git diff
-          #git commit -am "Update to latest Maven snapshot" || exit 0
-          #git remote add github "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
-          #git push github HEAD:${GITHUB_REF}
+          git diff --quiet
+          if ($LASTEXITCODE -eq 1) {
+            git add maven-snapshot/tools/chocolateyinstall.ps1
+            git commit -m "Update to latest Maven snapshot (git push from GA test)" || exit 0
+            #git commit -am "Update to latest Maven snapshot" || exit 0
+            git remote add github "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+            git push github HEAD:${GITHUB_REF}
+            exit 0
+          } else {
+            echo "No git changes detected, nothing to do"
+          }
