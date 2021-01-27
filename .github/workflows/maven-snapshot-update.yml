@@ -1,5 +1,5 @@
 name: Update maven-snapshot Chocolatey package
-#on:
+#TODO: on:
 #  schedule:
 #    - cron:  '0 * * * *'
 on: [push]
@@ -48,6 +48,8 @@ jobs:
           
       - name: Choco pack and install
         shell: powershell
+        env:
+          CHOCOLATEY_PACKAGE_API_KEY = ${{ secrets.CHOCOLATEY_PACKAGE_API_KEY }}
         run: |
           git diff --quiet
           if ($LASTEXITCODE -eq 1) {
@@ -71,6 +73,10 @@ jobs:
               exit 1
             }
             
+            #TODO: 
+            #choco apikey --key $env:CHOCOLATEY_PACKAGE_API_KEY --source https://push.chocolatey.org/
+            #choco push *.nupkg --source https://push.chocolatey.org/ <-- resolve package name somehow
+            
             exit 0
           } else {
             echo "No git changes detected, nothing to do"
@@ -82,8 +88,8 @@ jobs:
           git diff --quiet
           if ($LASTEXITCODE -eq 1) {
             git add maven-snapshot/tools/chocolateyinstall.ps1
-            git commit -m "Update to latest Maven snapshot (git push from GA test)" || exit 0
-            #git commit -am "Update to latest Maven snapshot" || exit 0
+            git commit -m "Update to latest Maven snapshot (git push from GA test)"
+            #TODO: git commit -am "Update to latest Maven snapshot"
             git remote add github "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
             git push github HEAD:${GITHUB_REF}
             exit 0
