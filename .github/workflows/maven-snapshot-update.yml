@@ -44,12 +44,15 @@ jobs:
             echo "Setting package version to: ${new_package_version}"
             sed -ir 's/    <version>.*/    <version>'${new_package_version}'<\/version>/' maven-snapshot.nuspec
             echo $last_successful_build_number > last-build.txt
+
+            echo "NEW_PACKAGE_VERSION=$new_package_version" >> $GITHUB_ENV
           fi
           
       - name: Choco pack and install
         shell: powershell
         env:
           CHOCOLATEY_PACKAGE_API_KEY: ${{ secrets.CHOCOLATEY_PACKAGE_API_KEY }}
+          NEW_PACKAGE_VERSION: ${{ env.NEW_PACKAGE_VERSION }}
         run: |
           git diff --quiet
           if ($LASTEXITCODE -eq 1) {
@@ -74,7 +77,7 @@ jobs:
             }
             
             choco apikey --key $env:CHOCOLATEY_PACKAGE_API_KEY --source https://push.chocolatey.org/
-            choco push *.nupkg --source https://push.chocolatey.org/
+            choco push maven-snapshot.${env:NEW_PACKAGE_VERSION}.nupkg --source https://push.chocolatey.org/
             
             exit 0
           } else {
