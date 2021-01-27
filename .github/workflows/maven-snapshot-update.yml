@@ -1,8 +1,7 @@
 name: Update maven-snapshot Chocolatey package
-#TODO: on:
-#  schedule:
-#    - cron:  '0 * * * *'
-on: [push]
+on:
+  schedule:
+    - cron:  '0 * * * *'
 jobs:
   update-package:
     runs-on: windows-latest
