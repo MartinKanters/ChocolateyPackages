@@ -73,9 +73,8 @@ jobs:
               exit 1
             }
             
-            #TODO: 
-            #choco apikey --key $env:CHOCOLATEY_PACKAGE_API_KEY --source https://push.chocolatey.org/
-            #choco push *.nupkg --source https://push.chocolatey.org/
+            choco apikey --key $env:CHOCOLATEY_PACKAGE_API_KEY --source https://push.chocolatey.org/
+            choco push *.nupkg --source https://push.chocolatey.org/
             
             exit 0
           } else {
@@ -87,9 +86,7 @@ jobs:
         run: |
           git diff --quiet
           if ($LASTEXITCODE -eq 1) {
-            git add maven-snapshot/tools/chocolateyinstall.ps1
-            git commit -m "Update to latest Maven snapshot (git push from GA test)"
-            #TODO: git commit -am "Update to latest Maven snapshot"
+            git commit -am "Update to latest Maven snapshot"
             git remote add github "https://${env:GITHUB_ACTOR}:${env:GITHUB_TOKEN}@github.com/${env:GITHUB_REPOSITORY}.git"
             git push github HEAD:${env:GITHUB_REF}
             exit 0
