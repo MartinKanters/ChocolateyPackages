@@ -49,7 +49,7 @@ jobs:
       - name: Choco pack and install
         shell: powershell
         env:
-          CHOCOLATEY_PACKAGE_API_KEY = ${{ secrets.CHOCOLATEY_PACKAGE_API_KEY }}
+          CHOCOLATEY_PACKAGE_API_KEY: ${{ secrets.CHOCOLATEY_PACKAGE_API_KEY }}
         run: |
           git diff --quiet
           if ($LASTEXITCODE -eq 1) {
