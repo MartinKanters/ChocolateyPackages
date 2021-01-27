@@ -75,7 +75,7 @@ jobs:
             
             #TODO: 
             #choco apikey --key $env:CHOCOLATEY_PACKAGE_API_KEY --source https://push.chocolatey.org/
-            #choco push *.nupkg --source https://push.chocolatey.org/ <-- resolve package name somehow
+            #choco push *.nupkg --source https://push.chocolatey.org/
             
             exit 0
           } else {
@@ -90,8 +90,8 @@ jobs:
             git add maven-snapshot/tools/chocolateyinstall.ps1
             git commit -m "Update to latest Maven snapshot (git push from GA test)"
             #TODO: git commit -am "Update to latest Maven snapshot"
-            git remote add github "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
-            git push github HEAD:${GITHUB_REF}
+            git remote add github "https://${env:GITHUB_ACTOR}:${env:GITHUB_TOKEN}@github.com/${env:GITHUB_REPOSITORY}.git"
+            git push github HEAD:${env:GITHUB_REF}
             exit 0
           } else {
             echo "No git changes detected, nothing to do"
