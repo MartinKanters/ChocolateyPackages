@@ -37,11 +37,11 @@ jobs:
             escaped_zip_artifact_url=$(printf '%s\n' "$zip_artifact_url" | sed -e 's/[\/&]/\\&/g')
             
             echo "Setting checksum to: ${zip_hash}"
-            sed -ir 's/$checksum =.*/$checksum = \"'${zip_hash}'\"/' tools/chocolateyinstall.ps1
+            sed -i 's/$checksum =.*/$checksum = \"'${zip_hash}'\"/' tools/chocolateyinstall.ps1
             echo "Setting artifact url to: ${zip_artifact_url}"
-            sed -ir 's/$url =.*/$url = \"'${escaped_zip_artifact_url}'\"/' tools/chocolateyinstall.ps1
+            sed -i 's/$url =.*/$url = \"'${escaped_zip_artifact_url}'\"/' tools/chocolateyinstall.ps1
             echo "Setting package version to: ${new_package_version}"
-            sed -ir 's/    <version>.*/    <version>'${new_package_version}'<\/version>/' maven-snapshot.nuspec
+            sed -i 's/    <version>.*/    <version>'${new_package_version}'<\/version>/' maven-snapshot.nuspec
             echo $last_successful_build_number > last-build.txt
 
             echo "NEW_PACKAGE_VERSION=$new_package_version" >> $GITHUB_ENV
