@@ -19,7 +19,7 @@ jobs:
         shell: bash
         run: |
           cd maven-snapshot/
-          base_jenkins_url="https://ci-builds.apache.org/job/Maven/job/maven-box/job/maven/job/master/"
+          base_jenkins_url="https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master/"
           last_successful_build=$(curl -s "${base_jenkins_url}/api/json" | jq '.lastSuccessfulBuild')
           
           last_persisted_build_number=$(cat last-build.txt)
