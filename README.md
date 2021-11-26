@@ -11,17 +11,17 @@ This package will be installed next to an existing Maven installation. By uninst
 
 ```
 > mvn -v
-Apache Maven 3.6.3 (cecedd343002696d0abb50b32b541b8a6ba2883f)
+Apache Maven 3.8.4 (9b656c72d54e5bacbed989b64718c159fe39b537)
 ...
-> choco install maven-latest -y
+> choco install maven-snapshot -y
 > refreshenv
 > mvn -v
 Apache Maven 4.0.0-alpha-1-SNAPSHOT (bb916d0784c7631866167928e4d0615df3317567)
 ...
-> choco uninstall maven-latest -y
+> choco uninstall maven-snapshot -y
 > refreshenv
 > mvn -v
-Apache Maven 3.6.3 (cecedd343002696d0abb50b32b541b8a6ba2883f)
+Apache Maven 3.8.4 (9b656c72d54e5bacbed989b64718c159fe39b537)
 ...
 ```
 	  
