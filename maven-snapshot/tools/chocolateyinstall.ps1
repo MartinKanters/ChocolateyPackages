@@ -16,8 +16,8 @@ function IsM2HomeBinInPath ([string]$pathToAdd) {
 	}
 }
 
-$checksum = "111b00cc4a005e21e2f5b723119faf744947f800ebab9b7069e5ab3283a3cd0a"
-$url = "https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master/146/artifact/org/apache/maven/apache-maven/4.0.0-alpha-3-SNAPSHOT/apache-maven-4.0.0-alpha-3-SNAPSHOT-bin.zip"
+$checksum = "23d862ab6692055e6897c17e0eef52763deb4cbd2d9de33664ce5854340f54c3"
+$url = "https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master/147/artifact/org/apache/maven/apache-maven/4.0.0-alpha-3-SNAPSHOT/apache-maven-4.0.0-alpha-3-SNAPSHOT-bin.zip"
 $tools = Split-Path $MyInvocation.MyCommand.Definition
 $package = Split-Path $tools
 $m2_home = Join-Path $package "apache-maven"
