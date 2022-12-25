@@ -1,7 +1,7 @@
 name: Update maven-snapshot Chocolatey package
 on: [push]
 #  schedule:
-#    - cron: '0 * * * *' # TODO - revert to '0 * * * *'
+#    - cron: '0 * * * *'
 jobs:
   update-package:
     runs-on: windows-latest
@@ -34,7 +34,7 @@ jobs:
           else
             echo "Found new successful snapshot artifact timestamp: ${newest_snapshot_timestamp}, old: ${last_persisted_build_timestamp}"
             zip_artifact_url="$base_snapshot_url/$base_snapshot_version/apache-maven-${newest_snapshot_version}-bin.zip"
-            zip_hash=$(curl -s "$zip_artifact_url" | shasum -a 256 | awk '{print $1}') # TODO revert - sha256sum
+            zip_hash=$(curl -s "$zip_artifact_url" | sha256sum | awk '{print $1}')
             escaped_zip_artifact_url=$(printf '%s\n' "$zip_artifact_url" | sed -e 's/[\/&]/\\&/g')
           
             echo "Setting checksum to: ${zip_hash}"
