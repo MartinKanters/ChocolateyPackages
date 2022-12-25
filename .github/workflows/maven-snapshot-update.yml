@@ -36,16 +36,17 @@ jobs:
             zip_artifact_url="$base_snapshot_url/$base_snapshot_version/apache-maven-${newest_snapshot_version}-bin.zip"
             zip_hash=$(curl -s "$zip_artifact_url" | sha256sum | awk '{print $1}')
             escaped_zip_artifact_url=$(printf '%s\n' "$zip_artifact_url" | sed -e 's/[\/&]/\\&/g')
+            package_version=${newest_snapshot_timestamp:0:8}.${newest_snapshot_timestamp:8}
           
             echo "Setting checksum to: ${zip_hash}"
             sed -i 's/$checksum =.*/$checksum = \"'${zip_hash}'\"/' tools/chocolateyinstall.ps1
             echo "Setting artifact url to: ${zip_artifact_url}"
             sed -i 's/$url =.*/$url = \"'${escaped_zip_artifact_url}'\"/' tools/chocolateyinstall.ps1
-            echo "Setting package version to: ${newest_snapshot_timestamp}"
-            sed -i 's/    <version>.*/    <version>'${newest_snapshot_timestamp}'<\/version>/' maven-snapshot.nuspec
+            echo "Setting package version to: ${package_version}"
+            sed -i 's/    <version>.*/    <version>'${package_version}'<\/version>/' maven-snapshot.nuspec
             echo "$newest_snapshot_timestamp" > last-build.txt
           
-            echo "NEW_PACKAGE_VERSION=$newest_snapshot_timestamp" >> $GITHUB_ENV
+            echo "NEW_PACKAGE_VERSION=$package_version" >> $GITHUB_ENV
           fi
           
       - name: Choco pack and install
