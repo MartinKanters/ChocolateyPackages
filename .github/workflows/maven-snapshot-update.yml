@@ -1,7 +1,7 @@
 name: Update maven-snapshot Chocolatey package
-on: [push] # TODO
-#  schedule:
-#    - cron: '0 * * * *'
+on:
+  schedule:
+    - cron: '0 * * * *'
 jobs:
   update-package:
     runs-on: windows-latest
@@ -46,7 +46,7 @@ jobs:
             sed -i 's/    <version>.*/    <version>'${package_version}'<\/version>/' maven-snapshot.nuspec
             echo "$newest_snapshot_timestamp" > last-build.txt
           
-            echo "NEW_PACKAGE_VERSION=$newest_snapshot_timestamp" >> $GITHUB_ENV
+            echo "NEW_PACKAGE_VERSION=$package_version" >> $GITHUB_ENV
           fi
           
       - name: Choco pack and install
@@ -55,7 +55,6 @@ jobs:
           CHOCOLATEY_PACKAGE_API_KEY: ${{ secrets.CHOCOLATEY_PACKAGE_API_KEY }}
           NEW_PACKAGE_VERSION: ${{ env.NEW_PACKAGE_VERSION }}
         run: |
-          exit # TODO
           git diff --quiet
           if ($LASTEXITCODE -eq 1) {
             cd maven-snapshot
@@ -89,7 +88,6 @@ jobs:
       - name: Persist changes
         shell: powershell
         run: |
-          exit # TODO
           git diff --quiet
           if ($LASTEXITCODE -eq 1) {
             git commit -am "Update to latest Maven snapshot"
