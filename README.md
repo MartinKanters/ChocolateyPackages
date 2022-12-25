@@ -1,6 +1,6 @@
 # Maven-snapshot choco package
 
-This package installs the latest built snapshot Maven distribution from the Apache Jenkins on the master branch. 
+This package installs the latest deployed Maven snapshot distribution from Apache's Nexus server. 
 	
 *Take care that these builds can be unstable!*
 	

@@ -1,7 +1,7 @@
 name: Update maven-snapshot Chocolatey package
 on:
   schedule:
-    - cron:  '0 * * * *'
+    - cron: '0 * * * *'
 jobs:
   update-package:
     runs-on: windows-latest
@@ -18,33 +18,34 @@ jobs:
       - name: Update package if needed
         shell: bash
         run: |
+          # Inspired by https://github.com/mthmulders/homebrew-maven-snapshot/blob/master/Formula/maven-snapshot.rb
           cd maven-snapshot/
-          base_jenkins_url="https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/job/master/"
-          last_successful_build=$(curl -s "${base_jenkins_url}/api/json" | jq '.lastSuccessfulBuild')
+          base_snapshot_url="https://repository.apache.org/content/groups/snapshots/org/apache/maven/apache-maven"
+          base_snapshot_version=$(curl -s "$base_snapshot_url/maven-metadata.xml" | xmllint -xpath '//metadata/versioning/latest/text()' -)
           
-          last_persisted_build_number=$(cat last-build.txt)
-          last_successful_build_number=$(echo $last_successful_build | jq '.number')
+          snapshot_artifact=$(curl -s "$base_snapshot_url/$base_snapshot_version/maven-metadata.xml" | xmllint -xpath "/metadata/versioning/snapshotVersions/snapshotVersion[./classifier='bin' and ./extension='tar.gz']" -)
+          newest_snapshot_version=$(echo "$snapshot_artifact" | xmllint -xpath "./snapshotVersion/value/text()" -)
+          newest_snapshot_timestamp=$(echo "$snapshot_artifact" | xmllint -xpath "./snapshotVersion/updated/text()" -)
           
-          if [ "$last_persisted_build_number" == "$last_successful_build_number" ]; then
-            echo "No new successful Maven master build detected, nothing to do"
+          last_persisted_build_timestamp=$(cat last-build.txt)
+          
+          if [ "$last_persisted_build_timestamp" == "$newest_snapshot_timestamp" ]; then
+          echo "No new successful Maven master build detected, nothing to do"
           else
-            echo "Found new successful Jenkins build: ${last_successful_build_number}, old: ${last_persisted_build_number}"
-            successful_build_url=$(echo $last_successful_build | jq -r '.url')
-            zip_artifact_path=$(curl -s "${successful_build_url}api/json" | jq -r '.artifacts[]|select(.fileName | test("^apache-maven-\\d.*-bin\\.zip$"))|.relativePath')
-            zip_artifact_url="${successful_build_url}artifact/${zip_artifact_path}"
+            echo "Found new successful snapshot artifact timestamp: ${newest_snapshot_timestamp}, old: ${last_persisted_build_timestamp}"
+            zip_artifact_url="$base_snapshot_url/$base_snapshot_version/apache-maven-${newest_snapshot_version}-bin.zip"
             zip_hash=$(curl -s "$zip_artifact_url" | sha256sum | awk '{print $1}')
-            new_package_version=$(date +'%Y%m%d.%H%M')
             escaped_zip_artifact_url=$(printf '%s\n' "$zip_artifact_url" | sed -e 's/[\/&]/\\&/g')
-            
+          
             echo "Setting checksum to: ${zip_hash}"
             sed -i 's/$checksum =.*/$checksum = \"'${zip_hash}'\"/' tools/chocolateyinstall.ps1
             echo "Setting artifact url to: ${zip_artifact_url}"
             sed -i 's/$url =.*/$url = \"'${escaped_zip_artifact_url}'\"/' tools/chocolateyinstall.ps1
-            echo "Setting package version to: ${new_package_version}"
-            sed -i 's/    <version>.*/    <version>'${new_package_version}'<\/version>/' maven-snapshot.nuspec
-            echo $last_successful_build_number > last-build.txt
-
-            echo "NEW_PACKAGE_VERSION=$new_package_version" >> $GITHUB_ENV
+            echo "Setting package version to: ${newest_snapshot_timestamp}"
+            sed -i 's/    <version>.*/    <version>'${newest_snapshot_timestamp}'<\/version>/' maven-snapshot.nuspec
+            echo "$newest_snapshot_timestamp" > last-build.txt
+          
+            echo "NEW_PACKAGE_VERSION=$newest_snapshot_timestamp" >> $GITHUB_ENV
           fi
           
       - name: Choco pack and install
