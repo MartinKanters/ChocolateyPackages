@@ -1,7 +1,7 @@
 name: Update maven-snapshot Chocolatey package
-on:
-  schedule:
-    - cron:  '0 * * * *'
+on: [push]
+#  schedule: # TODO - revert
+#    - cron:  '0 * * * *'
 jobs:
   update-package:
     runs-on: windows-latest
@@ -28,7 +28,7 @@ jobs:
           CHOCOLATEY_PACKAGE_API_KEY: ${{ secrets.CHOCOLATEY_PACKAGE_API_KEY }}
           NEW_PACKAGE_VERSION: ${{ env.NEW_PACKAGE_VERSION }}
         run: |
-          exit # TODO remove
+          exit # TODO: remove
           git diff --quiet
           if ($LASTEXITCODE -eq 1) {
             cd maven-snapshot
@@ -62,6 +62,7 @@ jobs:
       - name: Persist changes
         shell: powershell
         run: |
+          exit # TODO: remove
           git diff --quiet
           if ($LASTEXITCODE -eq 1) {
             git commit -am "Update to latest Maven snapshot"
