@@ -17,7 +17,7 @@
     <bugTrackerUrl>https://issues.apache.org/jira/browse/MNG</bugTrackerUrl>
     <tags>apache maven maven-snapshot latest-maven maven-dev-build</tags>
     <summary>This package installs the latest snapshot Maven distribution.</summary>
-    <description>This package installs the latest built snapshot Maven distribution from the Apache Jenkins on the master branch. 
+    <description>This package installs the latest deployed Maven snapshot distribution from Apache's Nexus server.
 	
 *Take care that these builds can be unstable!*
 	
