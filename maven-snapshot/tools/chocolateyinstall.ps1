@@ -17,7 +17,7 @@ function IsM2HomeBinInPath ([string]$pathToAdd) {
 }
 
 $checksum = "9ae5d32299c5e5d9dc1ca10c4f8d1d8cc81b833a1f8f16554db6c3e7dfc0c663"
-$url = "https://repository.apache.org/content/groups/snapshots/org/apache/maven/apache-maven/4.0.0-beta-4-SNAPSHOT/apache-maven-4.0.0-beta-4-20240711.164747-34-bin.zip"
+$url = "https://repository.apache.org/content/groups/snapshots/org/apache/maven/apache-maven/4.0.0-beta-4-SNAPSHOT/apache-maven-4.0.0-beta-4-20240722.032539-35-bin.zip"
 $tools = Split-Path $MyInvocation.MyCommand.Definition
 $package = Split-Path $tools
 $m2_home = Join-Path $package "apache-maven"
