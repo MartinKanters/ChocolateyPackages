@@ -37,11 +37,14 @@ jobs:
             zip_hash=$(curl -s "$zip_artifact_url" | sha256sum | awk '{print $1}')
             escaped_zip_artifact_url=$(printf '%s\n' "$zip_artifact_url" | sed -e 's/[\/&]/\\&/g')
             package_version=${newest_snapshot_timestamp:0:8}.${newest_snapshot_timestamp:8}
+            m2_home_dir="apache-maven-${base_snapshot_version}"
           
             echo "Setting checksum to: ${zip_hash}"
             sed -i 's/$checksum =.*/$checksum = \"'${zip_hash}'\"/' tools/chocolateyinstall.ps1
             echo "Setting artifact url to: ${zip_artifact_url}"
             sed -i 's/$url =.*/$url = \"'${escaped_zip_artifact_url}'\"/' tools/chocolateyinstall.ps1
+            echo "Setting m2_home dir to ${m2_home_dir}"
+            sed -i 's/$m2_home =.*/$m2_home = Join-Path $package \"apache-maven-'${m2_home_dir}'\"'
             echo "Setting package version to: ${package_version}"
             sed -i 's/    <version>.*/    <version>'${package_version}'<\/version>/' maven-snapshot.nuspec
             echo "$newest_snapshot_timestamp" > last-build.txt
