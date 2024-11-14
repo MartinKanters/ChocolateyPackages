@@ -1,5 +1,5 @@
 name: Update maven-snapshot Chocolatey package
-on:
+on:  
   schedule:
     - cron: '0 * * * *'
 jobs:
@@ -9,6 +9,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
 
       - name: Configure Git
         run: |
@@ -44,12 +49,13 @@ jobs:
             echo "Setting artifact url to: ${zip_artifact_url}"
             sed -i 's/$url =.*/$url = \"'${escaped_zip_artifact_url}'\"/' tools/chocolateyinstall.ps1
             echo "Setting m2_home dir to ${m2_home_dir}"
-            sed -i 's/$m2_home =.*/$m2_home = Join-Path $package \"apache-maven-'${m2_home_dir}'\"'
+            sed -i 's/$m2_home =.*/$m2_home = Join-Path $package \"apache-maven-'${m2_home_dir}'\"/' tools/chocolateyinstall.ps1
             echo "Setting package version to: ${package_version}"
             sed -i 's/    <version>.*/    <version>'${package_version}'<\/version>/' maven-snapshot.nuspec
             echo "$newest_snapshot_timestamp" > last-build.txt
           
             echo "NEW_PACKAGE_VERSION=$package_version" >> $GITHUB_ENV
+            echo "M2_HOME_DIR_NAME=$m2_home_dir" >> $GITHUB_ENV
           fi
           
       - name: Choco pack and install
@@ -57,6 +63,7 @@ jobs:
         env:
           CHOCOLATEY_PACKAGE_API_KEY: ${{ secrets.CHOCOLATEY_PACKAGE_API_KEY }}
           NEW_PACKAGE_VERSION: ${{ env.NEW_PACKAGE_VERSION }}
+          M2_HOME_DIR_NAME: ${{ env.M2_HOME_DIR_NAME }}
         run: |
           git diff --quiet
           if ($LASTEXITCODE -eq 1) {
@@ -72,14 +79,15 @@ jobs:
             choco install maven-snapshot -y --no-progress -s .
             
             # Unfortunately choco's `refreshenv` does not work in Github Actions
-            $mvn_snapshot_version = C:\ProgramData\chocolatey\lib\maven-snapshot\apache-maven\bin\mvn.cmd -v | Select -First 1
+            $mvn_path = "C:\ProgramData\chocolatey\lib\maven-snapshot\${env:M2_HOME_DIR_NAME}\bin\mvn.cmd"
+            $mvn_snapshot_version = & "$mvn_path" -v | Select -First 1
             write-host "Maven-snapshot installed: $mvn_snapshot_version"
             
             if ($orig_mvn_version -eq $mvn_snapshot_version) {
               write-host "Error: Maven Snapshot version is identical to the original Maven version"
               exit 1
             }
-            
+
             choco apikey --key $env:CHOCOLATEY_PACKAGE_API_KEY --source https://push.chocolatey.org/
             choco push maven-snapshot.${env:NEW_PACKAGE_VERSION}.nupkg --source https://push.chocolatey.org/
             
