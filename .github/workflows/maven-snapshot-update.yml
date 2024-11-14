@@ -74,7 +74,8 @@ jobs:
             choco install maven-snapshot -y --no-progress -s .
             
             # Unfortunately choco's `refreshenv` does not work in Github Actions
-            $mvn_snapshot_version = C:\ProgramData\chocolatey\lib\maven-snapshot\$M2_HOME_DIR_NAME\bin\mvn.cmd -v | Select -First 1
+            $mvn_path = "C:\ProgramData\chocolatey\lib\maven-snapshot\$M2_HOME_DIR_NAME\bin\mvn.cmd"
+            $mvn_snapshot_version = & "$mvn_path" -v | Select -First 1
             write-host "Maven-snapshot installed: $mvn_snapshot_version"
             
             if ($orig_mvn_version -eq $mvn_snapshot_version) {
