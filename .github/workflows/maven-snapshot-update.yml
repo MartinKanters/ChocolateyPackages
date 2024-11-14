@@ -1,7 +1,7 @@
 name: Update maven-snapshot Chocolatey package
-on:
-  push: 
-    branches: 'test-fix'
+on:  
+  schedule:
+    - cron: '0 * * * *'
 jobs:
   update-package:
     runs-on: windows-latest
@@ -87,22 +87,24 @@ jobs:
               write-host "Error: Maven Snapshot version is identical to the original Maven version"
               exit 1
             }
-            
+
+            choco apikey --key $env:CHOCOLATEY_PACKAGE_API_KEY --source https://push.chocolatey.org/
+            choco push maven-snapshot.${env:NEW_PACKAGE_VERSION}.nupkg --source https://push.chocolatey.org/
             
             exit 0
           } else {
             echo "No git changes detected, nothing to do"
           }
          
-      # - name: Persist changes
-      #   shell: powershell
-      #   run: |
-      #     git diff --quiet
-      #     if ($LASTEXITCODE -eq 1) {
-      #       git commit -am "Update to latest Maven snapshot"
-      #       git remote add github "https://${env:GITHUB_ACTOR}:${env:GITHUB_TOKEN}@github.com/${env:GITHUB_REPOSITORY}.git"
-      #       git push github HEAD:${env:GITHUB_REF}
-      #       exit 0
-      #     } else {
-      #       echo "No git changes detected, nothing to do"
-      #     }
+      - name: Persist changes
+        shell: powershell
+        run: |
+          git diff --quiet
+          if ($LASTEXITCODE -eq 1) {
+            git commit -am "Update to latest Maven snapshot"
+            git remote add github "https://${env:GITHUB_ACTOR}:${env:GITHUB_TOKEN}@github.com/${env:GITHUB_REPOSITORY}.git"
+            git push github HEAD:${env:GITHUB_REF}
+            exit 0
+          } else {
+            echo "No git changes detected, nothing to do"
+          }
