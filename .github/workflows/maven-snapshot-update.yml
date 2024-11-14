@@ -50,6 +50,7 @@ jobs:
             echo "$newest_snapshot_timestamp" > last-build.txt
           
             echo "NEW_PACKAGE_VERSION=$package_version" >> $GITHUB_ENV
+            echo "M2_HOME_DIR_NAME=$m2_home_dir" >> $GITHUB_ENV
           fi
           
       - name: Choco pack and install
@@ -57,6 +58,7 @@ jobs:
         env:
           CHOCOLATEY_PACKAGE_API_KEY: ${{ secrets.CHOCOLATEY_PACKAGE_API_KEY }}
           NEW_PACKAGE_VERSION: ${{ env.NEW_PACKAGE_VERSION }}
+          M2_HOME_DIR_NAME: ${{ env.M2_HOME_DIR_NAME }}
         run: |
           git diff --quiet
           if ($LASTEXITCODE -eq 1) {
@@ -72,7 +74,7 @@ jobs:
             choco install maven-snapshot -y --no-progress -s .
             
             # Unfortunately choco's `refreshenv` does not work in Github Actions
-            $mvn_snapshot_version = C:\ProgramData\chocolatey\lib\maven-snapshot\apache-maven\bin\mvn.cmd -v | Select -First 1
+            $mvn_snapshot_version = C:\ProgramData\chocolatey\lib\maven-snapshot\$M2_HOME_DIR_NAME\bin\mvn.cmd -v | Select -First 1
             write-host "Maven-snapshot installed: $mvn_snapshot_version"
             
             if ($orig_mvn_version -eq $mvn_snapshot_version) {
