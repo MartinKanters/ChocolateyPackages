@@ -2,9 +2,7 @@ name: Update maven-snapshot Chocolatey package
 on:  
   schedule:
     - cron: '0 * * * *'
-  push:
-    branches:
-      test-fix-2
+
 jobs:
   update-package:
     runs-on: windows-latest
@@ -93,7 +91,7 @@ jobs:
             write-host "Pushing choco package $choco_package_name"
 
             choco apikey --key $env:CHOCOLATEY_PACKAGE_API_KEY --source https://push.chocolatey.org/
-            choco push maven-snapshot.$choco_package_name --source https://push.chocolatey.org/
+            choco push $choco_package_name --source https://push.chocolatey.org/
 
             if ($LASTEXITCODE -ne 0) {
               write-host "Error: Choco push failed"
