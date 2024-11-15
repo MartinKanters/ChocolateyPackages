@@ -2,6 +2,7 @@ name: Update maven-snapshot Chocolatey package
 on:  
   schedule:
     - cron: '0 * * * *'
+
 jobs:
   update-package:
     runs-on: windows-latest
@@ -54,7 +55,6 @@ jobs:
             sed -i 's/    <version>.*/    <version>'${package_version}'<\/version>/' maven-snapshot.nuspec
             echo "$newest_snapshot_timestamp" > last-build.txt
           
-            echo "NEW_PACKAGE_VERSION=$package_version" >> $GITHUB_ENV
             echo "M2_HOME_DIR_NAME=$m2_home_dir" >> $GITHUB_ENV
           fi
           
@@ -62,7 +62,6 @@ jobs:
         shell: powershell
         env:
           CHOCOLATEY_PACKAGE_API_KEY: ${{ secrets.CHOCOLATEY_PACKAGE_API_KEY }}
-          NEW_PACKAGE_VERSION: ${{ env.NEW_PACKAGE_VERSION }}
           M2_HOME_DIR_NAME: ${{ env.M2_HOME_DIR_NAME }}
         run: |
           git diff --quiet
@@ -87,9 +86,17 @@ jobs:
               write-host "Error: Maven Snapshot version is identical to the original Maven version"
               exit 1
             }
+            $choco_package = Get-ChildItem -Filter "*.nupkg" | Select-Object -First 1
+            $choco_package_name = $choco_package.Name
+            write-host "Pushing choco package $choco_package_name"
 
             choco apikey --key $env:CHOCOLATEY_PACKAGE_API_KEY --source https://push.chocolatey.org/
-            choco push maven-snapshot.${env:NEW_PACKAGE_VERSION}.nupkg --source https://push.chocolatey.org/
+            choco push $choco_package_name --source https://push.chocolatey.org/
+
+            if ($LASTEXITCODE -ne 0) {
+              write-host "Error: Choco push failed"
+              exit 1
+            }
             
             exit 0
           } else {
