@@ -2,6 +2,9 @@ name: Update maven-snapshot Chocolatey package
 on:  
   schedule:
     - cron: '0 * * * *'
+  push:
+    branches:
+      test-fix-2
 jobs:
   update-package:
     runs-on: windows-latest
@@ -77,6 +80,7 @@ jobs:
             
             write-host "Installing Maven snapshot"
             choco install maven-snapshot -y --no-progress -s .
+            Get-ChildItem -File
             
             # Unfortunately choco's `refreshenv` does not work in Github Actions
             $mvn_path = "C:\ProgramData\chocolatey\lib\maven-snapshot\${env:M2_HOME_DIR_NAME}\bin\mvn.cmd"
@@ -88,23 +92,23 @@ jobs:
               exit 1
             }
 
-            choco apikey --key $env:CHOCOLATEY_PACKAGE_API_KEY --source https://push.chocolatey.org/
-            choco push maven-snapshot.${env:NEW_PACKAGE_VERSION}.nupkg --source https://push.chocolatey.org/
+            # choco apikey --key $env:CHOCOLATEY_PACKAGE_API_KEY --source https://push.chocolatey.org/
+            # choco push maven-snapshot.${env:NEW_PACKAGE_VERSION}.nupkg --source https://push.chocolatey.org/
             
             exit 0
           } else {
             echo "No git changes detected, nothing to do"
           }
          
-      - name: Persist changes
-        shell: powershell
-        run: |
-          git diff --quiet
-          if ($LASTEXITCODE -eq 1) {
-            git commit -am "Update to latest Maven snapshot"
-            git remote add github "https://${env:GITHUB_ACTOR}:${env:GITHUB_TOKEN}@github.com/${env:GITHUB_REPOSITORY}.git"
-            git push github HEAD:${env:GITHUB_REF}
-            exit 0
-          } else {
-            echo "No git changes detected, nothing to do"
-          }
+      # - name: Persist changes
+      #   shell: powershell
+      #   run: |
+      #     git diff --quiet
+      #     if ($LASTEXITCODE -eq 1) {
+      #       git commit -am "Update to latest Maven snapshot"
+      #       git remote add github "https://${env:GITHUB_ACTOR}:${env:GITHUB_TOKEN}@github.com/${env:GITHUB_REPOSITORY}.git"
+      #       git push github HEAD:${env:GITHUB_REF}
+      #       exit 0
+      #     } else {
+      #       echo "No git changes detected, nothing to do"
+      #     }
