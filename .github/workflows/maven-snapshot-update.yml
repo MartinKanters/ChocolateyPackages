@@ -92,23 +92,28 @@ jobs:
             $choco_package_name = $choco_package.Name
             write-host "Pushing choco package $choco_package_name"
 
-            # choco apikey --key $env:CHOCOLATEY_PACKAGE_API_KEY --source https://push.chocolatey.org/
-            # choco push maven-snapshot.$choco_package_name --source https://push.chocolatey.org/
+            choco apikey --key $env:CHOCOLATEY_PACKAGE_API_KEY --source https://push.chocolatey.org/
+            choco push maven-snapshot.$choco_package_name --source https://push.chocolatey.org/
+
+            if ($LASTEXITCODE -ne 0) {
+              write-host "Error: Choco push failed"
+              exit 1
+            }
             
             exit 0
           } else {
             echo "No git changes detected, nothing to do"
           }
          
-      # - name: Persist changes
-      #   shell: powershell
-      #   run: |
-      #     git diff --quiet
-      #     if ($LASTEXITCODE -eq 1) {
-      #       git commit -am "Update to latest Maven snapshot"
-      #       git remote add github "https://${env:GITHUB_ACTOR}:${env:GITHUB_TOKEN}@github.com/${env:GITHUB_REPOSITORY}.git"
-      #       git push github HEAD:${env:GITHUB_REF}
-      #       exit 0
-      #     } else {
-      #       echo "No git changes detected, nothing to do"
-      #     }
+      - name: Persist changes
+        shell: powershell
+        run: |
+          git diff --quiet
+          if ($LASTEXITCODE -eq 1) {
+            git commit -am "Update to latest Maven snapshot"
+            git remote add github "https://${env:GITHUB_ACTOR}:${env:GITHUB_TOKEN}@github.com/${env:GITHUB_REPOSITORY}.git"
+            git push github HEAD:${env:GITHUB_REF}
+            exit 0
+          } else {
+            echo "No git changes detected, nothing to do"
+          }
