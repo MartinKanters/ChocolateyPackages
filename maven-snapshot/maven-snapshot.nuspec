@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>maven-snapshot</id>
-    <version>20260323.205642</version>
+    <version>20260324.083756</version>
     <packageSourceUrl>https://github.com/MartinKanters/ChocolateyPackages</packageSourceUrl>
     <owners>Martin Kanters</owners>
 	
